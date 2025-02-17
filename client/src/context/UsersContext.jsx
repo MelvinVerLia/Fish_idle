@@ -1,11 +1,13 @@
 import React, { createContext, useEffect, useState } from "react";
 import InventoryFinder from "../../API/InventoryFinder";
+import IdleFinder from "../../API/IdleFinder";
 
 export const UsersContext = createContext();
 
 export const UsersContextProvider = (props) => {
   const [userId, setUserId] = useState(null);
   const [wallet, setWallet] = useState([]);
+  const [idle, setIdle] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -18,6 +20,19 @@ export const UsersContextProvider = (props) => {
       }
     }
   }, []);
+
+  const fetchTotalIdle = async () => {
+    if (!userId) return;
+
+    try {
+      const response = await IdleFinder.get("idle-total", {
+        params: { userId },
+      });
+      setIdle(response.data);
+    } catch (error) {
+      console.error("Failed to fetch idle data:", error);
+    }
+  };
 
   const fetchWallet = async () => {
     if (!userId) return;
@@ -36,14 +51,18 @@ export const UsersContextProvider = (props) => {
   useEffect(() => {
     if (userId === null) return;
 
-    fetchWallet(); // Fetch once immediately
-    const interval = setInterval(fetchWallet, 5000); // Fetch every 5 seconds
-
-    return () => clearInterval(interval); // Cleanup on unmount
+    fetchWallet(); 
+    fetchTotalIdle();
+    const wallet_interval = setInterval(fetchWallet, 5000); 
+    const idle_interval = setInterval(fetchTotalIdle, 5000);
+    return () => {
+      clearInterval(wallet_interval);
+      clearInterval(idle_interval);
+    };
   }, [userId]);
 
   return (
-    <UsersContext.Provider value={{ userId, setUserId, wallet, setWallet }}>
+    <UsersContext.Provider value={{ userId, setUserId, wallet, setWallet, idle, setIdle}}>
       {props.children}
     </UsersContext.Provider>
   );

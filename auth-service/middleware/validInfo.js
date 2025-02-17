@@ -5,7 +5,7 @@ module.exports = async (req, res, next) => {
 
   if (req.path === "/register") {
     if (!name) {
-      return res.status(400).json({ error: "Missing name" });
+      return res.status(400).json({ error: "Missing username" });
     }
     if (!email) {
       return res.status(400).json({ error: "Missing email" });
@@ -17,7 +17,7 @@ module.exports = async (req, res, next) => {
     if (!email) {
       return res.status(400).json({ error: "Missing email" });
     }
-
+    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ error: "Invalid email format" });
@@ -27,6 +27,5 @@ module.exports = async (req, res, next) => {
       return res.status(400).json({ error: "Missing password" });
     }
   }
-
   next();
 };

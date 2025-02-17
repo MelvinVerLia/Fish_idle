@@ -75,13 +75,85 @@ app.get("/shop/factory/buy/:id", async (req, res) => {
       [userId, factoryId]
     );
 
-    const wallet = await db.query("SELECT wallet from users where id = $1", [userId]);
+    const wallet = await db.query("SELECT wallet from users where id = $1", [
+      userId,
+    ]);
 
     res.status(200).json({
       status: "success",
       data: result.rows[0],
       wallet: wallet.rows[0],
       message: `Factory purchased successfully! Wallet deducted by ${factoryPrice}.`,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+const tiers = [
+  { name: "Tier I", cost: 500, isPurchased: true },
+  { name: "Tier II", cost: 1000, isPurchased: false },
+  { name: "Tier III", cost: 5000, isPurchased: false },
+  { name: "Tier IV", cost: 10000, isPurchased: false },
+  { name: "Tier V", cost: 25000, isPurchased: false },
+  { name: "Tier Max", cost: 100000, isPurchased: false },
+];
+
+app.put("/buy-tiers", async (req, res) => {
+  const userId = req.body.userId;
+  try {
+    if (!userId) return res.json({ error: "User Id is required" });
+
+    const response = await db.query(
+      "SELECT wallet, level FROM users WHERE id = $1",
+      [userId]
+    );
+
+    const { wallet, level } = response.rows[0];
+
+    if (response.rows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (level >= tiers.length) {
+      return res.status(400).json({ error: "Max tier reached" });
+    }
+
+    const nextTier = tiers[level];
+    if (wallet < nextTier.cost) {
+      return res.status(400).json({ error: "Not enough money" });
+    }
+
+    tiers[level].isPurchased = true;
+    const updateUser = await db.query(
+      "UPDATE users SET wallet = wallet - $1, level = level + 1 WHERE id = $2 RETURNING wallet, level",
+      [nextTier.cost, userId]
+    );
+
+    res.json({
+      status: "success",
+      message: `Upgraded to ${nextTier.name}`,
+      wallet: updateUser.rows[0].wallet,
+      level: updateUser.rows[0].level,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json("Server Error");
+  }
+});
+
+app.get("/tiers", async (req, res) => {
+  const userId = req.query.userId;
+  try {
+    const response = await db.query("SELECT level FROM users where id = $1", [
+      userId,
+    ]);
+    const currLev = response.rows[0].level;
+    res.status(200).json({
+      status: "success",
+      tiers: tiers,
+      currentLevel: { currLev },
     });
   } catch (error) {
     console.log(error);

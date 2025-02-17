@@ -5,6 +5,7 @@ import { FactoryContextProvider } from "../context/FactoryContext";
 import Wallet from "../components/Wallet";
 import { FishContextProvider } from "../context/FishContext";
 import { UsersContextProvider } from "../context/UsersContext";
+import TierShop from "../components/TierShop";
 
 const Shop = () => {
   return (
@@ -14,6 +15,7 @@ const Shop = () => {
           <Header />
           <Wallet />
           <FactoryShop />
+          <TierShop />
         </FactoryContextProvider>
       </FishContextProvider>
     </UsersContextProvider>

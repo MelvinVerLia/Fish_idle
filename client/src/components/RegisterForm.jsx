@@ -36,7 +36,7 @@ const RegisterForm = () => {
     <section className="flex flex-col md:flex-row h-screen items-center">
       <div className="bg-indigo-600 hidden lg:block w-full md:w-1/2 xl:w-2/3 h-screen">
         <img
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRl-i92mYuDJ3c6pg0orhLCFE59X3HYKtzw2w&s"
+          src="https://images.unsplash.com/photo-1497671954146-59a89ff626ff?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c21hbGwlMjBmaXNofGVufDB8fDB8fHww"
           alt=""
           className="w-full h-full"
         />
@@ -65,7 +65,7 @@ const RegisterForm = () => {
             <div className="mt-4">
               <label className="block text-gray-700">Email Address</label>
               <input
-                type="email"
+                type="text"
                 placeholder="Enter Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -82,7 +82,6 @@ const RegisterForm = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter Password"
-                minLength="6"
                 className="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
               />
             </div>
